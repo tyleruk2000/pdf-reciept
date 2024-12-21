@@ -6,31 +6,33 @@ export default function Home() {
   const [formData, setFormData] = useState({ title: "", bullets: "" });
   const [downloadLink, setDownloadLink] = useState(null);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submission and PDF generation
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("hello");
 
     try {
-      const response = await fetch("/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // Dynamically import the pdf-lib library
+      const { PDFDocument } = await import('pdf-lib');
 
-      if (response.ok) {
-        const data = await response.json();
-        setDownloadLink(data.filePath);
-      } else {
-        console.error("Failed to generate PDF");
-      }
+      // Create a new PDF document
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([350, 400]);
+      page.moveTo(110, 200);
+      page.drawText('Hello World!');
+      const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+      console.log(pdfDataUri)
+
+      setDownloadLink(pdfDataUri);
+
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error generating PDF:", err);
     }
   };
 
@@ -91,6 +93,7 @@ export default function Home() {
         <div className="mt-4">
           <a
             href={downloadLink}
+            target="_blank"
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
           >
             Download PDF
