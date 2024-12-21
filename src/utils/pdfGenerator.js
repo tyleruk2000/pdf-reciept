@@ -3,7 +3,7 @@ import { PDFDocument } from 'pdf-lib';
 const fontSize = 18;
 const maxPageSize = 300;
 const maxPageInPoint = (maxPageSize / 25.4) * 72;;
-const lineGap = 2;
+const lineGap = 5;
 const bottomMargin = 5;
 
 // Function to generate a PDF
@@ -54,7 +54,24 @@ export const generatePDF = async ({ title, bullets }) => {
       if (cleanLine === "") {
         bulletPoint = '';
       }
-      page.drawText(`${bulletPoint}${cleanLine}`, { size: fontSize });
+      if (bullet.startsWith("#")) {
+        bulletPoint = '';
+      }
+      const chunkSize = 22;
+      const chunks = [];
+      for (let i = 0; i < cleanLine.length; i += chunkSize) {
+        chunks.push(cleanLine.slice(i, i + chunkSize));
+      }
+
+      // Draw each chunk of the line
+      chunks.forEach((chunk, chunkIndex) => {
+        if (chunkIndex > 0) {
+          bulletY = bulletY - (fontSize + lineGap); // Move down for each line
+          page.moveTo(10, bulletY);
+          bulletPoint = '';
+        }
+        page.drawText(`${bulletPoint}${chunk}`, { size: fontSize });
+      });
     });
 
     // Generate PDF in base64 format
