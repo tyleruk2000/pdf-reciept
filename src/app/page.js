@@ -91,11 +91,11 @@ export default function Home() {
 
       {downloadLink && (
         <div className="mt-4">
-          <a
-            href={downloadLink}
-            target="_blank"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
+            <a
+              href={downloadLink}
+              download={`${formData.title}.pdf`}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
             Download PDF
           </a>
         </div>
