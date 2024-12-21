@@ -4,7 +4,7 @@ import { useState } from "react";
 import { generatePDF } from "../utils/pdfGenerator"; // Import the utility function
 
 export default function Home() {
-  const [formData, setFormData] = useState({ title: "", bullets: "" });
+  const [formData, setFormData] = useState({ title: "", bullets: "", wrapText: false });
   const [downloadLink, setDownloadLink] = useState(null);
 
   // Handle form input changes
@@ -13,17 +13,21 @@ export default function Home() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle checkbox change to update formData
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: checked }));
+  };
+
   // Handle form submission and PDF generation
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("hello");
 
     try {
-      // Use the utility function to generate the PDF
+      // Pass formData to generatePDF
       const pdfDataUri = await generatePDF(formData);
-
       setDownloadLink(pdfDataUri);
-
     } catch (err) {
       console.error("Error generating PDF:", err);
     }
@@ -72,6 +76,20 @@ export default function Home() {
           ></textarea>
         </div>
 
+        {/* Add checkbox for wrap text */}
+        <div className="mb-6">
+          <label className="inline-flex items-center text-sm font-bold text-gray-700">
+            <input
+              type="checkbox"
+              className="form-checkbox"
+              name="wrapText" // Update the name to be part of formData
+              checked={formData.wrapText} // Bind to formData.wrapText
+              onChange={handleCheckboxChange} // Update formData when checked state changes
+            />
+            <span className="ml-2">Wrap Text</span>
+          </label>
+        </div>
+
         <div className="flex items-center justify-between">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -91,7 +109,8 @@ export default function Home() {
           >
             Download PDF
           </a>
-          <iframe className="mt-4"
+          <iframe
+            className="mt-4"
             src={downloadLink}
             width="100%"
             height="600"
@@ -103,3 +122,4 @@ export default function Home() {
     </div>
   );
 }
+
