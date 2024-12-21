@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { generatePDF } from "../utils/pdfGenerator"; // Import the utility function
 
 export default function Home() {
   const [formData, setFormData] = useState({ title: "", bullets: "" });
@@ -18,16 +19,8 @@ export default function Home() {
     console.log("hello");
 
     try {
-      // Dynamically import the pdf-lib library
-      const { PDFDocument } = await import('pdf-lib');
-
-      // Create a new PDF document
-      const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([350, 400]);
-      page.moveTo(110, 200);
-      page.drawText('Hello World!');
-      const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
-      console.log(pdfDataUri)
+      // Use the utility function to generate the PDF
+      const pdfDataUri = await generatePDF(formData);
 
       setDownloadLink(pdfDataUri);
 
@@ -91,13 +84,20 @@ export default function Home() {
 
       {downloadLink && (
         <div className="mt-4">
-            <a
-              href={downloadLink}
-              download={`${formData.title}.pdf`}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
+          <a
+            href={downloadLink}
+            download={`${formData.title}.pdf`}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
             Download PDF
           </a>
+          <iframe className="mt-4"
+            src={downloadLink}
+            width="100%"
+            height="600"
+            style={{ border: "none" }}
+            title="PDF Preview"
+          ></iframe>
         </div>
       )}
     </div>
