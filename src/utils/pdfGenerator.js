@@ -1,9 +1,9 @@
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
-const fontSize = 18;
+const fontSize = 15;
 const maxPageSize = 300;
 const maxPageInPoint = (maxPageSize / 25.4) * 72;;
-const lineGap = 5;
+const lineGap = 2;
 const bottomMargin = 5;
 
 // Function to generate a PDF
@@ -25,11 +25,13 @@ export const generatePDF = async ({ title, bullets, wrapText }) => {
 
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
+    const fontBold = await pdfDoc.embedFont(StandardFonts.Courier);
+    const font = await pdfDoc.embedFont(StandardFonts.Courier);
     let page = pdfDoc.addPage([widthInPoints, heightInPoints]);
 
     // Customize PDF content with title and bullets
     page.moveTo(10, heightInPoints-20);
-    page.drawText(`${title}`, { size: fontSize});
+    page.drawText(`${title}`, { size: fontSize+10, font: fontBold });
     page.drawLine({
         start: { x: 0, y: heightInPoints-12-fontSize },
         end: { x: widthInPoints, y: heightInPoints-12-fontSize },
@@ -59,7 +61,7 @@ export const generatePDF = async ({ title, bullets, wrapText }) => {
       }
 
       if (wrapText) {
-        const chunkSize = 22;
+        const chunkSize = 15;
         const chunks = [];
         for (let i = 0; i < cleanLine.length; i += chunkSize) {
           chunks.push(cleanLine.slice(i, i + chunkSize));
@@ -72,11 +74,11 @@ export const generatePDF = async ({ title, bullets, wrapText }) => {
             page.moveTo(10, bulletY);
             bulletPoint = '';
           }
-          page.drawText(`${bulletPoint}${chunk}`, { size: fontSize });
+          page.drawText(`${bulletPoint}${chunk}`, { size: fontSize, font: font });
         });
       }
       else {
-        page.drawText(`${bulletPoint}${cleanLine}`, { size: fontSize });
+        page.drawText(`${bulletPoint}${cleanLine}`, { size: fontSize, font: font });
       }
 
     });
